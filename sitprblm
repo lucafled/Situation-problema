@@ -23,3 +23,24 @@ def menu():
         elif dicho == "6":
             print("¡Hasta luego! Vuelve pronto.")
             break
+
+
+def asking():
+    print(1)
+
+def random_match():
+    print(1)
+
+def leaderboard():
+    print(1)
+
+def mennuu():
+    print(1)
+
+def points():
+    print(1)
+
+
+
+
+menu()
