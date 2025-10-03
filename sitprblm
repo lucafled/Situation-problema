@@ -1,0 +1,25 @@
+def mennuu():
+    print("\n TORNEO DE TENIS ")
+    print("1. Registrar jugador")
+    print("2. Duelo")
+    print("3. Leaderboard")
+    print("4. Mostrar menu")
+    print("5. Registrar puntos")
+    print("6. Salir")
+
+def menu():
+    while True:
+        dicho = input("Elige una opción: ")
+        if dicho == "1":
+            asking()
+        elif dicho == "2":
+            random_match()
+        elif dicho == "3":
+            leaderboard()
+        elif dicho == "4":
+            mennuu()
+        elif dicho == "5":
+            points()
+        elif dicho == "6":
+            print("¡Hasta luego! Vuelve pronto.")
+            break
