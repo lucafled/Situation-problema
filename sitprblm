@@ -15,36 +15,36 @@ def menu():
     while True:
         dicho = input("Elige una opción: ")
         if dicho == "1":
-            asking()
+            tickets()
         elif dicho == "2":
-            random_match()
+            datos_concierto()
         elif dicho == "3":
-            leaderboard()
+            lugares()
         elif dicho == "4":
-            mennuu()
+            datos_ventas()
         elif dicho == "5":
-            points()
+            reportes_ventas()
         elif dicho == "6":
             print("¡Hasta luego! Vuelve pronto.")
             break
 
 
-def asking():
+def tickets():
     numeroboletos = int(input("ingresa cuantos boletos quieres: "))
 
     print(numeroboletos)
 
-def random_match():
-    print(1)
+def datos_concierto():
+    print(2)
 
-def leaderboard():
-    print(1)
+def lugares():
+    print(3)
 
-def mennuu():
-    print(1)
+def datos_ventas():
+    print(4)
 
-def points():
-    print(1)
+def reportes_ventas():
+    print(5)
 
 menu()
 
