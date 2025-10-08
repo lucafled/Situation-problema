@@ -1,11 +1,15 @@
+#class Jugador/.py
+
 def mennuu():
     print("\n TORNEO DE TENIS ")
-    print("1. Registrar jugador")
-    print("2. Duelo")
-    print("3. Leaderboard")
-    print("4. Mostrar menu")
-    print("5. Registrar puntos")
+    print("1. Registrar compra de boletos.")
+    print("2. Consultar datos del concierto")
+    print("3. Consultar lugares disponibles.")
+    print("4. Consultar datos de las ventas.")
+    print("5. Mostrar reportes de ventas por concierto.")
     print("6. Salir")
+
+mennuu()
 
 def menu():
     while True:
@@ -26,7 +30,9 @@ def menu():
 
 
 def asking():
-    print(1)
+    numeroboletos = int(input("ingresa cuantos boletos quieres: "))
+
+    print(numeroboletos)
 
 def random_match():
     print(1)
@@ -40,7 +46,9 @@ def mennuu():
 def points():
     print(1)
 
-
-
-
 menu()
+
+
+    
+
+
