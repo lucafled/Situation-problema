@@ -1,5 +1,80 @@
 #class Jugador/.py
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+import re
+import os
+import csv
+
+# Modelos de datos
+
+@dataclass
+class SectionInfo:
+    capacity: int
+    remaining: int
+    price: float
+
+@dataclass
+class Concert:
+    id: int
+    artist: str
+    date: str
+    time: str
+    venue: str
+    sections: Dict[str, SectionInfo]
+
+
+#conversion de valores
+
+def parse_price_range(s: str) -> Tuple[int, int]:
+    nums = re.findall(r"\d[\d,]*", s)
+    if len(nums) < 2:
+        raise ValueError(f"Rango de precio inválido: {s}")
+    lo = int(nums[0].replace(",", ""))
+    hi = int(nums[1].replace(",", ""))
+    if lo > hi:
+        lo, hi = hi, lo
+    return lo, hi
+
+
+#lista de conciertos
+
+def preload_conciertos() -> List[Concert]:
+    # artista, fecha, hora, lugar, costo-rango
+    base_rows = [
+        ("The Weeknd",          "abril 20",     "21:00", "GNP seguros",              "2,000-14,000"),
+        ("The Weeknd",          "abril 21",     "21:00", "GNP seguros",              "2,000-14,000"),
+        ("Guns N' Roses",       "noviembre 8",  "21:00", "GNP seguros",              "2,100 - 9,000"),
+        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 11", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 12", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 15", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 16", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 19", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 20", "21:00", "GNP seguros",              "2,000-16,000"),
+        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),  # duplicado en tu lista original
+        ("Chayanne",            "octubre 9",    "21:00", "Palacio de los deportes",  "2,300-6,000"),
+        ("Hozier",              "octubre 14",   "21:00", "Palacio de los deportes",  "700-2,000"),
+        ("Cuarteto de Nos",     "octubre 18",   "20:00", "Palacio de los deportes",  "1,900-6,800"),
+        ("Enrique Guzmán",      "octubre 25",   "21:30", "La Maraka",                "1,500-3,300"),
+        ("Yuri",                "noviembre 6",  "20:30", "Auditorio Nacional",       "500-3,800"),
+    ]
+
+    concerts: List[Concert] = []
+    for i, row in enumerate(base_rows, start=1):
+        artist, date, time, venue, cost_range = row
+        lo, hi = parse_price_range(cost_range)
+        sections = secciones(lo, hi)
+        concerts.append(Concert(
+            id=i,
+            artist=artist,
+            date=date,
+            time=time,
+            venue=venue,
+            sections=sections
+        ))
+    return concerts
+
 def mennuu():
     print("\n TORNEO DE TENIS ")
     print("1. Registrar compra de boletos.")
