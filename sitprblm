@@ -149,8 +149,12 @@ def datos_concierto():
 # Menú mínimo para probar SOLO la opción 2
 # =========================
 def mennuu():
-    print("\n TORNEO DE TENIS ")
+   print("\n TORNEO DE TENIS ")
+    print("1. Registrar compra de boletos.")
     print("2. Consultar datos del concierto")
+    print("3. Consultar lugares disponibles.")
+    print("4. Consultar datos de las ventas.")
+    print("5. Mostrar reportes de ventas por concierto.")
     print("6. Salir")
 
 def menu():
