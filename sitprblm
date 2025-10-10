@@ -157,6 +157,8 @@ def mennuu():
     print("5. Mostrar reportes de ventas por concierto.")
     print("6. Salir")
 
+
+
 def menu():
     mennuu()
     while True:
