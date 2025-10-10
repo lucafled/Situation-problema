@@ -1,13 +1,10 @@
-#class Jugador/.py
-
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 import re
-import os
-import csv
 
+# =========================
 # Modelos de datos
-
+# =========================
 @dataclass
 class SectionInfo:
     capacity: int
@@ -23,9 +20,35 @@ class Concert:
     venue: str
     sections: Dict[str, SectionInfo]
 
+# =========================
+# Utilidades de entrada
+# =========================
+def input_int(prompt: str, min_value: Optional[int] = None, max_value: Optional[int] = None) -> int:
+    while True:
+        raw = input(prompt).strip()
+        if not re.fullmatch(r"-?\d+", raw or ""):
+            print("Entrada inválida. Debe ser un número entero.")
+            continue
+        val = int(raw)
+        if min_value is not None and val < min_value:
+            print(f"El número debe ser ≥ {min_value}.")
+            continue
+        if max_value is not None and val > max_value:
+            print(f"El número debe ser ≤ {max_value}.")
+            continue
+        return val
 
-#conversion de valores
+def input_choice(prompt: str, choices: List[str]) -> str:
+    norm = {c.lower(): c for c in choices}
+    while True:
+        raw = input(prompt).strip().lower()
+        if raw in norm:
+            return norm[raw]
+        print(f"Opción inválida. Elija entre: {', '.join(choices)}")
 
+# =========================
+# Conversión de rangos
+# =========================
 def parse_price_range(s: str) -> Tuple[int, int]:
     nums = re.findall(r"\d[\d,]*", s)
     if len(nums) < 2:
@@ -36,11 +59,23 @@ def parse_price_range(s: str) -> Tuple[int, int]:
         lo, hi = hi, lo
     return lo, hi
 
+def secciones(lo: int, hi: int) -> Dict[str, SectionInfo]:
+    # Construye 4 secciones a partir del rango [lo, hi]
+    general = lo
+    platea = int(round(lo + 0.40 * (hi - lo), -1))
+    preferente = int(round(lo + 0.70 * (hi - lo), -1))
+    vip = hi
+    return {
+        "General":    SectionInfo(capacity=500, remaining=500, price=float(general)),
+        "Platea":     SectionInfo(capacity=250, remaining=250, price=float(platea)),
+        "Preferente": SectionInfo(capacity=200, remaining=200, price=float(preferente)),
+        "VIP":        SectionInfo(capacity=120, remaining=120, price=float(vip)),
+    }
 
-#lista de conciertos
-
+# =========================
+# Carga de conciertos
+# =========================
 def preload_conciertos() -> List[Concert]:
-    # artista, fecha, hora, lugar, costo-rango
     base_rows = [
         ("The Weeknd",          "abril 20",     "21:00", "GNP seguros",              "2,000-14,000"),
         ("The Weeknd",          "abril 21",     "21:00", "GNP seguros",              "2,000-14,000"),
@@ -52,78 +87,84 @@ def preload_conciertos() -> List[Concert]:
         ("Bad Bunny",           "diciembre 16", "21:00", "GNP seguros",              "2,000-16,000"),
         ("Bad Bunny",           "diciembre 19", "21:00", "GNP seguros",              "2,000-16,000"),
         ("Bad Bunny",           "diciembre 20", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),  # duplicado en tu lista original
+        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),
         ("Chayanne",            "octubre 9",    "21:00", "Palacio de los deportes",  "2,300-6,000"),
         ("Hozier",              "octubre 14",   "21:00", "Palacio de los deportes",  "700-2,000"),
         ("Cuarteto de Nos",     "octubre 18",   "20:00", "Palacio de los deportes",  "1,900-6,800"),
         ("Enrique Guzmán",      "octubre 25",   "21:30", "La Maraka",                "1,500-3,300"),
         ("Yuri",                "noviembre 6",  "20:30", "Auditorio Nacional",       "500-3,800"),
     ]
-
     concerts: List[Concert] = []
     for i, row in enumerate(base_rows, start=1):
         artist, date, time, venue, cost_range = row
         lo, hi = parse_price_range(cost_range)
         sections = secciones(lo, hi)
         concerts.append(Concert(
-            id=i,
-            artist=artist,
-            date=date,
-            time=time,
-            venue=venue,
-            sections=sections
+            id=i, artist=artist, date=date, time=time, venue=venue, sections=sections
         ))
     return concerts
 
+# =========================
+# Estado + helpers de consulta
+# =========================
+CONCERTS: List[Concert] = preload_conciertos()
+
+def find_concert(concert_id: int) -> Optional[Concert]:
+    for c in CONCERTS:
+        if c.id == concert_id:
+            return c
+    return None
+
+def _print_concert_detail(c: Concert) -> None:
+    print(f"\nID: {c.id}")
+    print(f"Artista: {c.artist}")
+    print(f"Fecha/hora: {c.date} {c.time}")
+    print(f"Lugar: {c.venue}")
+    print("Secciones:")
+    for name, s in c.sections.items():
+        print(f"  - {name:<10} Precio ${s.price:,.2f} MXN | Disponibles {s.remaining}/{s.capacity}")
+
+# =========================
+# Opción 2: datos_concierto
+# =========================
+def datos_concierto():
+    if not CONCERTS:
+        print("No hay conciertos cargados.")
+        return
+
+    modo = input_choice("¿Ver (uno) o (todos)?: ", ["uno", "todos"])
+    if modo == "todos":
+        for c in CONCERTS:
+            _print_concert_detail(c)
+        return
+
+    cid = input_int("Ingrese el ID del concierto: ", min_value=1, max_value=len(CONCERTS))
+    c = find_concert(cid)
+    if not c:
+        print("Concierto no encontrado.")
+        return
+    _print_concert_detail(c)
+
+# =========================
+# Menú mínimo para probar SOLO la opción 2
+# =========================
 def mennuu():
     print("\n TORNEO DE TENIS ")
-    print("1. Registrar compra de boletos.")
     print("2. Consultar datos del concierto")
-    print("3. Consultar lugares disponibles.")
-    print("4. Consultar datos de las ventas.")
-    print("5. Mostrar reportes de ventas por concierto.")
     print("6. Salir")
 
-mennuu()
-
 def menu():
+    mennuu()
     while True:
-        dicho = input("Elige una opción: ")
-        if dicho == "1":
-            tickets()
-        elif dicho == "2":
+        dicho = input("Elige una opción: ").strip()
+        if dicho == "2":
             datos_concierto()
-        elif dicho == "3":
-            lugares()
-        elif dicho == "4":
-            datos_ventas()
-        elif dicho == "5":
-            reportes_ventas()
         elif dicho == "6":
             print("¡Hasta luego! Vuelve pronto.")
             break
+        else:
+            print("Opción inválida. Solo están activas 2 y 6 por ahora.")
 
-
-def tickets():
-    numeroboletos = int(input("ingresa cuantos boletos quieres: "))
-
-    print(numeroboletos)
-
-def datos_concierto():
-    print(2)
-
-def lugares():
-    print(3)
-
-def datos_ventas():
-    print(4)
-
-def reportes_ventas():
-    print(5)
-
-menu()
-
-
-    
-
-
+# Ejecutar
+if __name__ == "__main__":
+    menu()
