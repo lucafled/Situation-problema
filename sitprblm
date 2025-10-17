@@ -132,7 +132,7 @@ def tickets():
     print("\n== Registrar compra de boletos ==")
     for c in CONCERTS:
         print(f"{c.id}. {c.artist} ({c.date} {c.time}) @ {c.venue}")
-    cid = input_int("\nSeleccione el ID del concierto: ", 1, len(CONCERTS))
+    cid = input_int("\nSeleccione el ID del concierto (1 - 16): ", 1, len(CONCERTS))
     concert = find_concert(cid)
     if not concert:
         print("Concierto no encontrado.")
@@ -172,12 +172,85 @@ def datos_concierto():
             _print_concert_detail(c)
         return
 
-    cid = input_int("Ingrese el ID del concierto: ", min_value=1, max_value=len(CONCERTS))
+    cid = input_int("Ingrese el ID del concierto (1 - 16): ", min_value=1, max_value=len(CONCERTS))
     c = find_concert(cid)
     if not c:
         print("Concierto no encontrado.")
         return
     _print_concert_detail(c)
+
+
+
+
+def lugares_disponibles():
+    print("\n== Consultar lugares disponibles ==")
+    if not CONCERTS:
+        print("No hay conciertos cargados.")
+        return
+
+    print("Disponibilidad por concierto:")
+    print("-----------------------------------------------------------------------------------------")
+    print(f"{'ID':<3} | {'Artista':<20} | {'Fecha':<10} | {'Lugar':<20} | {'Disponibles Total':<18}")
+    print("-----------------------------------------------------------------------------------------")
+
+    for c in CONCERTS:
+        # Suma los boletos restantes de todas las secciones de un concierto
+        total_disponibles = sum(s.remaining for s in c.sections.values())
+        print(f"{c.id:<3} | {c.artist:<20} | {c.date:<10} | {c.venue:<20} | {total_disponibles:<18,}")
+    
+    print("-----------------------------------------------------------------------------------------")
+    print("\nPara ver el detalle por sección, use la opción 2 (Consultar datos del concierto).")
+    print("Ingrese el ID del concierto deseado (1 - 16).")
+
+
+
+
+
+
+def consultar_ventas():
+    print("\n== Consultar datos detallados de ventas y disponibilidad ==")
+    if not CONCERTS:
+        print("No hay conciertos cargados.")
+        return
+
+    # Muestra la lista de conciertos para que el usuario elija
+    for c in CONCERTS:
+        print(f"{c.id}. {c.artist} ({c.date})")
+
+    # Pide el ID del concierto
+    cid = input_int("\nSeleccione el ID del concierto (1 - 16) para ver el reporte: ", 1, len(CONCERTS))
+    concert = find_concert(cid)
+    
+    if not concert:
+        print("Concierto no encontrado.")
+        return
+
+    print(f"\n--- Reporte de Ventas para: {concert.artist} ({concert.date}) ---")
+    
+    total_vendidos = 0
+    total_disponibles = 0
+    total_capacidad = 0
+    
+    # Imprime la cabecera
+    print(f"\n{'Sección':<12} | {'Capacidad':<10} | {'Vendidos':<8} | {'Disponibles':<11} | {'Precio':<12}")
+    print("-" * 60)
+    
+    # Itera sobre las secciones
+    for name, s in concert.sections.items():
+        vendidos = s.capacity - s.remaining
+        
+        # Actualiza totales
+        total_vendidos += vendidos
+        total_disponibles += s.remaining
+        total_capacidad += s.capacity
+        
+        # Imprime los datos por sección
+        print(f"{name:<12} | {s.capacity:<10} | {vendidos:<8} | {s.remaining:<11} | ${s.price:,.2f}")
+
+    print("-" * 60)
+    print(f"{'TOTALES':<12} | {total_capacidad:<10} | {total_vendidos:<8} | {total_disponibles:<11} |")
+
+
 
 # =========================
 # Menú
@@ -194,11 +267,17 @@ def mennuu():
 def menu():
     mennuu()
     while True:
-        dicho = input("Elige una opción: ").strip()
+        dicho = input("Elige una opción (ingresa 0 para volver al menu): ").strip()
+        if dicho == "0":
+            mennuu()
         if dicho == "1":
             tickets()
         if dicho == "2":
             datos_concierto()
+        if dicho == "3":
+            lugares_disponibles()
+        if dicho == "4":
+            consultar_ventas()
         elif dicho == "6":
             print("¡Hasta luego! Vuelve pronto.")
             break
