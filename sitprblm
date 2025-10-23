@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 import re
 
+
 # =========================
 # Modelos de datos
 # =========================
@@ -11,6 +12,7 @@ class SectionInfo:
     remaining: int
     price: float
 
+
 @dataclass
 class Concert:
     id: int
@@ -19,6 +21,16 @@ class Concert:
     time: str
     venue: str
     sections: Dict[str, SectionInfo]
+
+@dataclass
+class Sale:
+    sale_id: int
+    concert_id: int
+    section: str
+    quantity: int
+    unit_price: float
+    total_price: float
+
 
 # =========================
 # Utilidades de entrada
@@ -38,6 +50,7 @@ def input_int(prompt: str, min_value: Optional[int] = None, max_value: Optional[
             continue
         return val
 
+
 def input_choice(prompt: str, choices: List[str]) -> str:
     norm = {c.lower(): c for c in choices}
     while True:
@@ -45,6 +58,7 @@ def input_choice(prompt: str, choices: List[str]) -> str:
         if raw in norm:
             return norm[raw]
         print(f"Opción inválida. Elija entre: {', '.join(choices)}")
+
 
 # =========================
 # Conversión de rangos
@@ -59,6 +73,7 @@ def parse_price_range(s: str) -> Tuple[int, int]:
         lo, hi = hi, lo
     return lo, hi
 
+
 def secciones(lo: int, hi: int) -> Dict[str, SectionInfo]:
     # Construye 4 secciones a partir del rango [lo, hi]
     general = lo
@@ -66,33 +81,34 @@ def secciones(lo: int, hi: int) -> Dict[str, SectionInfo]:
     preferente = int(round(lo + 0.70 * (hi - lo), -1))
     vip = hi
     return {
-        "General":    SectionInfo(capacity=500, remaining=500, price=float(general)),
-        "Platea":     SectionInfo(capacity=250, remaining=250, price=float(platea)),
+        "General": SectionInfo(capacity=500, remaining=500, price=float(general)),
+        "Platea": SectionInfo(capacity=250, remaining=250, price=float(platea)),
         "Preferente": SectionInfo(capacity=200, remaining=200, price=float(preferente)),
-        "VIP":        SectionInfo(capacity=120, remaining=120, price=float(vip)),
+        "VIP": SectionInfo(capacity=120, remaining=120, price=float(vip)),
     }
+
 
 # =========================
 # Carga de conciertos
 # =========================
 def preload_conciertos() -> List[Concert]:
     base_rows = [
-        ("The Weeknd",          "abril 20",     "21:00", "GNP seguros",              "2,000-14,000"),
-        ("The Weeknd",          "abril 21",     "21:00", "GNP seguros",              "2,000-14,000"),
-        ("Guns N' Roses",       "noviembre 8",  "21:00", "GNP seguros",              "2,100 - 9,000"),
-        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 11", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 12", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 15", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 16", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 19", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 20", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Bad Bunny",           "diciembre 10", "21:00", "GNP seguros",              "2,000-16,000"),
-        ("Chayanne",            "octubre 9",    "21:00", "Palacio de los deportes",  "2,300-6,000"),
-        ("Hozier",              "octubre 14",   "21:00", "Palacio de los deportes",  "700-2,000"),
-        ("Cuarteto de Nos",     "octubre 18",   "20:00", "Palacio de los deportes",  "1,900-6,800"),
-        ("Enrique Guzmán",      "octubre 25",   "21:30", "La Maraka",                "1,500-3,300"),
-        ("Yuri",                "noviembre 6",  "20:30", "Auditorio Nacional",       "500-3,800"),
+        ("The Weeknd", "abril 20", "21:00", "GNP seguros", "2,000-14,000"),
+        ("The Weeknd", "abril 21", "21:00", "GNP seguros", "2,000-14,000"),
+        ("Guns N' Roses", "noviembre 8", "21:00", "GNP seguros", "2,100 - 9,000"),
+        ("Bad Bunny", "diciembre 10", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 11", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 12", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 15", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 16", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 19", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 20", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Bad Bunny", "diciembre 10", "21:00", "GNP seguros", "2,000-16,000"),
+        ("Chayanne", "octubre 9", "21:00", "Palacio de los deportes", "2,300-6,000"),
+        ("Hozier", "octubre 14", "21:00", "Palacio de los deportes", "700-2,000"),
+        ("Cuarteto de Nos", "octubre 18", "20:00", "Palacio de los deportes", "1,900-6,800"),
+        ("Enrique Guzmán", "octubre 25", "21:30", "La Maraka", "1,500-3,300"),
+        ("Yuri", "noviembre 6", "20:30", "Auditorio Nacional", "500-3,800"),
     ]
     concerts: List[Concert] = []
     for i, row in enumerate(base_rows, start=1):
@@ -104,17 +120,21 @@ def preload_conciertos() -> List[Concert]:
         ))
     return concerts
 
+
 # =========================
 # Estado + helpers de consulta
 # =========================
 CONCERTS: List[Concert] = preload_conciertos()
-SALES: list = []
+SALES: List[Sale] = []      # usar tipo List[Sale]
+NEXT_SALE_ID: int = 1       # folio autoincremental para ventas
+
 
 def find_concert(concert_id: int) -> Optional[Concert]:
     for c in CONCERTS:
         if c.id == concert_id:
             return c
     return None
+
 
 def _print_concert_detail(c: Concert) -> None:
     print(f"\nID: {c.id}")
@@ -125,11 +145,14 @@ def _print_concert_detail(c: Concert) -> None:
     for name, s in c.sections.items():
         print(f"  - {name:<10} Precio ${s.price:,.2f} MXN | Disponibles {s.remaining}/{s.capacity}")
 
+
 # =========================
 # Opción 1: tickets
 # =========================
 
 def tickets():
+    global SALES, NEXT_SALE_ID
+
     print("\n== Registrar compra de boletos ==")
     for c in CONCERTS:
         print(f"{c.id}. {c.artist} ({c.date} {c.time}) @ {c.venue}")
@@ -159,6 +182,18 @@ def tickets():
     s_info.remaining -= qty
     print(f"Compra realizada: {qty} boletos en {section}. Total: ${total:,.2f}")
 
+    venta = Sale(
+        sale_id=NEXT_SALE_ID,
+        concert_id=concert.id,
+        section=section,
+        quantity=qty,
+        unit_price=s_info.price,
+        total_price=total,
+    )
+    SALES.append(venta)
+    NEXT_SALE_ID += 1
+
+
 # =========================
 # Opción 2: datos_concierto
 # =========================
@@ -181,8 +216,6 @@ def datos_concierto():
     _print_concert_detail(c)
 
 
-
-
 def lugares_disponibles():
     print("\n== Consultar lugares disponibles ==")
     if not CONCERTS:
@@ -198,13 +231,15 @@ def lugares_disponibles():
         # Suma los boletos restantes de todas las secciones de un concierto
         total_disponibles = sum(s.remaining for s in c.sections.values())
         print(f"{c.id:<3} | {c.artist:<20} | {c.date:<10} | {c.venue:<20} | {total_disponibles:<18,}")
-    
+
     print("-----------------------------------------------------------------------------------------")
     print("\nPara ver el detalle por sección, use la opción 2 (Consultar datos del concierto).")
     print("Ingrese el ID del concierto deseado (1 - 16).")
 
 
 def datos_ventas():
+    global SALES
+
     if not SALES:
         print("\nAún no hay ventas registradas.")
         return
@@ -223,8 +258,6 @@ def datos_ventas():
     print(f"\nTotal recaudado: ${total_recaudado:,.2f}")
 
 
-
-
 def consultar_ventas():
     print("\n== Consultar datos detallados de ventas y disponibilidad ==")
     if not CONCERTS:
@@ -238,30 +271,30 @@ def consultar_ventas():
     # Pide el ID del concierto
     cid = input_int("\nSeleccione el ID del concierto (1 - 16) para ver el reporte: ", 1, len(CONCERTS))
     concert = find_concert(cid)
-    
+
     if not concert:
         print("Concierto no encontrado.")
         return
 
     print(f"\n--- Reporte de Ventas para: {concert.artist} ({concert.date}) ---")
-    
+
     total_vendidos = 0
     total_disponibles = 0
     total_capacidad = 0
-    
+
     # Imprime la cabecera
     print(f"\n{'Sección':<12} | {'Capacidad':<10} | {'Vendidos':<8} | {'Disponibles':<11} | {'Precio':<12}")
     print("-" * 60)
-    
+
     # Itera sobre las secciones
     for name, s in concert.sections.items():
         vendidos = s.capacity - s.remaining
-        
+
         # Actualiza totales
         total_vendidos += vendidos
         total_disponibles += s.remaining
         total_capacidad += s.capacity
-        
+
         # Imprime los datos por sección
         print(f"{name:<12} | {s.capacity:<10} | {vendidos:<8} | {s.remaining:<11} | ${s.price:,.2f}")
 
@@ -269,18 +302,18 @@ def consultar_ventas():
     print(f"{'TOTALES':<12} | {total_capacidad:<10} | {total_vendidos:<8} | {total_disponibles:<11} |")
 
 
-
 # =========================
 # Menú
 # =========================
 def mennuu():
-    print("\n TORNEO DE TENIS ")
+    print("\n Taquilla de boletos de conciertos ")
     print("1. Registrar compra de boletos.")
     print("2. Consultar datos del concierto")
     print("3. Consultar lugares disponibles.")
     print("4. Consultar datos de las ventas.")
     print("5. Mostrar reportes de ventas por concierto.")
     print("6. Salir")
+
 
 def menu():
     mennuu()
