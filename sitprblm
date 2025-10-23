@@ -108,6 +108,7 @@ def preload_conciertos() -> List[Concert]:
 # Estado + helpers de consulta
 # =========================
 CONCERTS: List[Concert] = preload_conciertos()
+SALES: list = []
 
 def find_concert(concert_id: int) -> Optional[Concert]:
     for c in CONCERTS:
