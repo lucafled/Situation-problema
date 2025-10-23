@@ -203,6 +203,23 @@ def lugares_disponibles():
     print("Ingrese el ID del concierto deseado (1 - 16).")
 
 
+def datos_ventas():
+    if not SALES:
+        print("\nAún no hay ventas registradas.")
+        return
+
+    total_recaudado = 0.0
+    print("\n== Ventas registradas ==")
+    for s in SALES:
+        c = find_concert(s.concert_id)
+        titulo = f"{c.artist} ({c.date} {c.time})" if c else f"Concierto {s.concert_id}"
+        print(
+            f"Folio {s.sale_id:04d} | {titulo} | Sección: {s.section:<10} "
+            f"| Cant: {s.quantity:2d} | Unit: ${s.unit_price:,.2f} | Importe: ${s.total_price:,.2f}"
+        )
+        total_recaudado += s.total_price
+
+    print(f"\nTotal recaudado: ${total_recaudado:,.2f}")
 
 
 
