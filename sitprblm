@@ -294,6 +294,8 @@ def menu():
         if dicho == "3":
             lugares_disponibles()
         if dicho == "4":
+            datos_ventas()
+        if dicho == "5":
             consultar_ventas()
         elif dicho == "6":
             print("¡Hasta luego! Vuelve pronto.")
